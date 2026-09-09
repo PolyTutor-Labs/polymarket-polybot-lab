@@ -1,13 +1,17 @@
 # Getting started (DRY_RUN)
 
-Paper-trade the live Polymarket BTC 5-minute order books. The engine defaults
-to `DRY_RUN=true`. No LLM is on the execution path.
+Paper-trade the live Polymarket BTC 5-minute order books. The engine
+defaults to `DRY_RUN=true`. No LLM is on the execution path.
+
+This is an **educational** install path. **DRY_RUN first.** See
+[paper-trading.md](paper-trading.md) for what the simulator does and
+does not model.
 
 ## Install and run
 
-Install from the repository root. `python bot.py` may be launched from any
-working directory — imports and runtime files resolve from the repo root
-via `Path(__file__)`, not the process cwd.
+Install from the repository root. `python bot.py` may be launched from
+any working directory — imports and runtime files resolve from the repo
+root via `Path(__file__)`, not the process cwd.
 
 ```bash
 pip install -r requirements.txt
@@ -24,9 +28,9 @@ python bot.py status          # PnL, budget left, streak, halt state
 `bot.py` stays at the repo root so these commands do not change. Engine
 modules load from `src/`; strategies load from `strategies/`.
 
-Stay on DRY_RUN for paper research. Weeks of simulated trades are for
-learning the engine, not a go-live countdown. Live mode remains High risk
-and incomplete (see below).
+Stay on DRY_RUN for paper research. Simulated trades are for learning
+the engine, not a go-live countdown. Live mode remains High risk and
+incomplete ([limitations.md](limitations.md)).
 
 ## Environment notes
 
@@ -46,52 +50,45 @@ repository root. `KILL_SWITCH` (or `KILL_SWITCH_FILE`) is resolved against
 the repository root. Relative paths do not follow the process cwd. Both
 the database and the kill-switch file are gitignored.
 
-## Going live (not supported; deliberately incomplete)
+## Emergency stop
+
+`touch KILL_SWITCH` at the repository root — the next risk-gate check
+halts the engine. Restart requires removing the file,
+`python bot.py reset`, and a human review of the halt reason.
+
+`python bot.py reset` does not delete `KILL_SWITCH`. Type `RESET` to
+clear a persisted halt after you have reviewed logs and the store.
+
+## Reading the live path (not supported)
 
 Live trading is **not** part of this educational lab. The security notes
-treat live mode as High risk: the signing key is held in-process, `CLOB_HOST`
-is not allowlisted, the live reconciler raises `NotImplementedError`, and
-`py-clob-client` is unpinned. See [SECURITY.md](../SECURITY.md).
+treat live mode as High risk: the signing key is held in-process,
+`CLOB_HOST` is not allowlisted, the live reconciler raises
+`NotImplementedError`, and `py-clob-client` is unpinned. See
+[SECURITY.md](../SECURITY.md) and [limitations.md](limitations.md).
 
-This is not a production checklist. If you still read the educational live
-path, the original engine gates remain:
+This is not a production checklist. The original engine still **gates**
+the live path so students can read it:
 
-1. **Dedicated wallet** funded with bankroll only. Key in env at runtime,
-   never in files the agent can read, never in chat with any agent.
-2. Audit + pin `py-clob-client` in `requirements.txt`.
+1. Dedicated wallet funded with bankroll only. Key in env at runtime,
+   never in files an agent can read, never in chat with any agent.
+2. Audit + pin `py-clob-client` in `requirements.txt` (deferred).
 3. One-time USDC (ERC-20) + CTF (ERC-1155) allowance approvals
-   (`python bot.py approve` — wire to audited contract addresses first).
+   (`python bot.py approve` — **stub**, exits 1).
 4. `.env`: `DRY_RUN=false` **and** `LIVE_TRADING_ACK=I_UNDERSTAND_THE_RISKS`.
    Either one alone refuses to start.
 5. Verify the market's tie rule (flat close). The engine treats
    close == open as DOWN; confirm against the live market's resolution
    source before trusting DRY_RUN accounting.
-6. Run on a VPS, not a laptop. Keep `MAX_BET=2` until the analyst report
-   says otherwise.
+6. Keep `MAX_BET` small. Paper results do not transfer.
 
-**Emergency stop:** `touch KILL_SWITCH` at the repository root — next
-risk-gate check halts the engine. Restart requires removing the file,
-`python bot.py reset`, and a human review of the halt reason.
+## What this deliberately does not do
 
-## What this deliberately does NOT do
-
-- No LLM calls at trade time (latency + nondeterminism = exit liquidity)
-- No martingale / DCA-into-losers (averaging down on a 5-minute binary is a
-  tail-risk machine, not a strategy)
-- No chasing: limit orders at the observed ask, FOK, no repricing loop
-- No directional trading live until calibration proves the model
-- No "recover today's loss" logic of any kind: when the budget is spent,
-  the day is over
-
-## Known limitations (accepted, documented)
-
-- Window open/close prices come from the Binance spot feed sampled at the
-  window boundary — an approximation of the market's official resolution
-  source. Good enough for DRY_RUN accounting.
-- The live reconciler is **not implemented** (`NotImplementedError`). It is
-  not a source of truth and not production-ready.
-- DRY_RUN fills are pessimistic (displayed size only, no price improvement)
-  but cannot model queue position or being quoted against.
+- No LLM calls at trade time
+- No martingale / DCA-into-losers
+- No chasing: limit orders at the observed ask, FOK, no taker reprice loop
+- No directional trading live (`enable_directional_live` is false)
+- No "recover today's loss" logic: when the budget is spent, the day is over
 
 ## Compliance note
 
@@ -99,7 +96,10 @@ Polymarket geo-blocks several jurisdictions (Italy included). Operating
 through a blocked region risks account restriction and frozen funds.
 That risk is yours and no engineering mitigates it.
 
-## Offline review
+## Next
 
-After paper sessions, use [analyst-prompt.md](analyst-prompt.md) as a
-read-only nightly review. The LLM stays outside the execution path.
+- [Paper / DRY_RUN](paper-trading.md)
+- [Architecture](architecture.md)
+- [Strategies](strategies.md)
+- [Limitations](limitations.md)
+- [Offline review](analyst-prompt.md) — LLM stays outside the execution path
