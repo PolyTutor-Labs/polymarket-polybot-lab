@@ -1,9 +1,14 @@
-"""Central configuration. Loaded from environment / .env file.
+"""Central configuration. Loaded from process environment variables.
+
+``load_settings()`` reads ``os.environ`` (or a mapping passed in for tests).
+It does **not** auto-load a ``.env`` file. Export variables or
+``set -a; source .env; set +a`` before starting the engine.
 
 Safety invariants:
 - DRY_RUN defaults to True. Live trading additionally requires
   LIVE_TRADING_ACK="I_UNDERSTAND_THE_RISKS".
-- PRIVATE_KEY is never logged. repr/str of Settings redacts secrets.
+- PRIVATE_KEY / TELEGRAM_BOT_TOKEN use ``repr=False``. Do not log
+  ``model_dump()``.
 - Full Kelly is forbidden; the daily loss budget defaults to 1% of bankroll
   and cannot be configured above 5%.
 """
@@ -65,6 +70,7 @@ class Settings(BaseModel):
     # --- Wallet / API ---
     private_key: str = Field(default="", repr=False)
     safe_address: str = ""                      # Polymarket Safe/proxy wallet (optional)
+    # Official CLOB. Any other host receives signed live requests if a key is set.
     clob_host: str = "https://clob.polymarket.com"
     chain_id: int = 137                         # Polygon
 

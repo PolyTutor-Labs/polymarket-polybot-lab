@@ -108,7 +108,7 @@ daily PnL, loss streak, open exposure and halt status before the first tick.
 | `src/engine.py` | Tick orchestration, equal-shares pair execution with unhedged-leg halt, settlement loop, risk-state persistence/restore |
 | `src/executor.py` | DryRun simulator (pessimistic fills) / Live CLOB adapter (FOK orders, Safe `signature_type=2` paired with `funder`) |
 | `src/store.py` | SQLite (WAL): orders (idempotent client IDs), fills, settlements, window open/close prices, persisted risk state |
-| `src/reconciler.py` | Startup + periodic state-vs-exchange check; mismatch = halt |
+| `src/reconciler.py` | Startup + periodic state-vs-exchange check; mismatch = halt. **Live path raises `NotImplementedError`** — educational limitation, not production-ready |
 | `src/calibration.py` | Rolling Brier / log loss / hit rate |
 | `src/notifier.py` | Telegram alerts with secret redaction (alerts only — control belongs to the external supervisor bot) |
 | `src/feeds.py` | Binance spot + CLOB top-of-book; refuses stale ticks; never Gamma API |
