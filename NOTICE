@@ -1,0 +1,20 @@
+PolyTutor — Polymarket BTC 5-Minute Engine Lab
+https://github.com/PolyTutor-Labs/polymarket-polybot-lab
+
+This product includes software originally developed as PolyBot:
+
+  Project: simoneatzori/Polybot-
+  URL:     https://github.com/simoneatzori/Polybot-
+  License: Apache License, Version 2.0
+
+The BTC 5-minute engine, pair-arbitrage and maker experiments,
+directional data-collection path, risk gate, dry-run executor, and
+capital-protection invariants originate from that project.
+
+PolyTutor-Labs does not claim ownership of the original PolyBot source
+work. Lab packaging contributions — repository organization, path
+portability, security hardening notes and scanners, quality gates,
+educational documentation, and public-release metadata — are separate
+from the original engine and are also licensed under Apache 2.0.
+
+See LICENSE for the full license text.

@@ -160,6 +160,26 @@ def test_internal_markdown_links_resolve():
     assert missing == []
 
 
+def test_public_release_metadata_files_exist():
+    for name in (
+        "LICENSE",
+        "NOTICE",
+        "CHANGELOG.md",
+        "CONTRIBUTING.md",
+        "DISCLAIMER.md",
+        "SECURITY.md",
+        "SECURITY_AUDIT.md",
+    ):
+        assert (_ROOT / name).is_file(), name
+    changelog = (_ROOT / "CHANGELOG.md").read_text()
+    assert "0.1.0" in changelog
+    assert "do **not** claim profitability" in changelog
+    readme = (_ROOT / "README.md").read_text()
+    assert "educational" in readme.lower()
+    assert "research lab" in readme.lower()
+    assert "guaranteed-profit" in readme.lower()
+
+
 def test_quality_workflow_is_read_only():
     wf = (_ROOT / ".github" / "workflows" / "quality.yml").read_text()
     assert "permissions:" in wf
