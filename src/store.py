@@ -10,6 +10,9 @@ from __future__ import annotations
 import sqlite3
 import time
 from contextlib import contextmanager
+from pathlib import Path
+
+from config import resolve_data_path
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS orders (
@@ -56,7 +59,11 @@ CREATE TABLE IF NOT EXISTS kv (
 
 class Store:
     def __init__(self, path: str) -> None:
-        self.conn = sqlite3.connect(path)
+        resolved = resolve_data_path(path)
+        if resolved != ":memory:":
+            Path(resolved).parent.mkdir(parents=True, exist_ok=True)
+        self.path = resolved
+        self.conn = sqlite3.connect(resolved)
         self.conn.execute("PRAGMA journal_mode=WAL")
         self.conn.row_factory = sqlite3.Row
         self.conn.executescript(SCHEMA)

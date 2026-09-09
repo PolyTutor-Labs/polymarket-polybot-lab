@@ -32,6 +32,8 @@ import math
 import os
 from dataclasses import dataclass, field
 
+from config import resolve_ops_path
+
 
 @dataclass
 class RiskDecision:
@@ -61,6 +63,7 @@ class RiskGate:
     high_water_mark: float = 0.0           # peak equity (bankroll + cumulative_pnl)
 
     def __post_init__(self) -> None:
+        self.kill_switch_file = resolve_ops_path(self.kill_switch_file)
         if self.high_water_mark <= 0:
             self.high_water_mark = max(self.bankroll, 0.0)
 

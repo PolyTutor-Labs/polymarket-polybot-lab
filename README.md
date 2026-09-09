@@ -70,7 +70,7 @@ Full install notes, go-live criteria, and emergency stop:
 Architecture diagram and per-module responsibilities:
 [docs/architecture.md](docs/architecture.md).
 
-**Emergency stop:** `touch KILL_SWITCH` in the working directory — next
+**Emergency stop:** `touch KILL_SWITCH` at the repository root — next
 risk-gate check halts the engine. Restart requires removing the file,
 `python bot.py reset`, and a human review of the halt reason.
 

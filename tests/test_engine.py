@@ -3,14 +3,14 @@ risk gate -> idempotent persistence -> dry-run fill -> settlement -> breaker.
 """
 from __future__ import annotations
 
-import os
 import sys
 import time
+from pathlib import Path
 from unittest.mock import patch
 
-_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(_ROOT, "src"))
-sys.path.insert(0, os.path.join(_ROOT, "strategies"))
+_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_ROOT / "src"))
+sys.path.insert(0, str(_ROOT / "strategies"))
 
 from config import Settings
 from engine import Engine

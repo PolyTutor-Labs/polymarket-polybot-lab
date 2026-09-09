@@ -4,14 +4,14 @@ crashes with orders resting, repricing churn.
 """
 from __future__ import annotations
 
-import os
 import sys
+from pathlib import Path
 
 import pytest
 
-_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(_ROOT, "src"))
-sys.path.insert(0, os.path.join(_ROOT, "strategies"))
+_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_ROOT / "src"))
+sys.path.insert(0, str(_ROOT / "strategies"))
 
 from config import Settings
 from engine import Engine
