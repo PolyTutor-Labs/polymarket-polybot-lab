@@ -1,5 +1,11 @@
 # SECURITY_AUDIT.md — Pre-PolyTutor Audit
 
+**Layout note (repository structure organization):** this audit was written
+against the original flat tree. Findings are unchanged. Source modules now
+live under `src/` (engine) and `strategies/` (pair arb, maker, directional).
+The CLI entrypoint remains `bot.py` at the repository root. Historical path
+names in the tables below still identify the same files.
+
 **Repository:** https://github.com/simoneatzori/Polybot-  
 **Audit clone path:** `/workspace/polytutor-labs/polybot-audit`  
 **Local audit branch:** `security/polybot-audit` (not pushed)  
@@ -27,11 +33,11 @@ Rationale: clean of planted secrets and hostile code; original capital-protectio
 | Item | Detail |
 |---|---|
 | Language | Python 3 (stdlib + pydantic; pytest for tests) |
-| Layout | Flat package at repo root + `tests/` |
+| Layout | Originally a flat package at repo root + `tests/`. Now `src/` + `strategies/` + `docs/` + root `bot.py` |
 | Entrypoint | `bot.py` (`run` / `status` / `reset` / `approve`) |
-| Core modules | `engine.py`, `executor.py`, `maker.py`, `risk_gate.py`, `strategy.py`, `store.py`, `feeds.py`, `config.py`, `notifier.py`, `reconciler.py`, `sizing.py`, `fees.py`, `models.py`, `calibration.py`, `timeutil.py` |
+| Core modules | `src/engine.py`, `src/executor.py`, `strategies/maker.py`, `src/risk_gate.py`, `strategies/strategy.py`, `src/store.py`, `src/feeds.py`, `src/config.py`, `src/notifier.py`, `src/reconciler.py`, `src/sizing.py`, `src/fees.py`, `src/models.py`, `src/calibration.py`, `src/timeutil.py` |
 | Config samples | `.env.example`, `.gitignore` |
-| Docs | `README.md`, `ANALYST_PROMPT.md`, `LICENSE` (Apache-2.0) |
+| Docs | `README.md`, `docs/analyst-prompt.md` (was `ANALYST_PROMPT.md`), `LICENSE` (Apache-2.0) |
 | Tests | `tests/test_core.py`, `test_engine.py`, `test_maker.py`, `test_risk_protection.py` |
 | CI/CD | **None** (no `.github/`, no GitLab/Jenkins/Docker/Makefile) |
 | Binaries / wheels / native libs | **None** observed in working tree |
@@ -54,17 +60,17 @@ Identity note: this is a **specialized Polymarket BTC 5-min engine**, not a gene
 | No real `.env` committed | (absent from `git ls-files`) | — | Keep `.env` gitignored; never force-add |
 | `.env.example` placeholders only (empty `PRIVATE_KEY`, `TELEGRAM_*`, etc.) | `.env.example` | Info | Safe to publish; keep values empty |
 | Synthetic private-key **fixture** in unit tests (`0x` + repeated hex `a`) | `tests/test_core.py` | Low | Keep synthetic; do not replace with real keys; optional comment that value is non-custodial test data |
-| Settings fields marked `repr=False` for key/token | `config.py` | Positive control | Retain |
-| Notifier redacts hex keys and Telegram bot-token shapes | `notifier.py` | Positive control | Retain; extend if new secret formats appear |
+| Settings fields marked `repr=False` for key/token | `src/config.py` | Positive control | Retain |
+| Notifier redacts hex keys and Telegram bot-token shapes | `src/notifier.py` | Positive control | Retain; extend if new secret formats appear |
 | Git history for `.env` / `*.pem` / `*.key` | history review | Info | Only `.env.example` introduced in import commit; **no evidence of real key material in history** |
 
 ### Secret-handling design notes (not committed leaks)
 
 | Finding | Path | Severity | Remediation |
 |---|---|---|---|
-| Live executor passes `private_key` into third-party `ClobClient` and derives API creds | `executor.py` (`LiveClobExecutor._build_client`) | High (live only) | Pin + audit `py-clob-client`; dedicated low-balance wallet; never log settings; prefer OS secret store / env injection at runtime |
-| Telegram bot token placed in HTTPS URL path | `notifier.py` | Medium | Prefer header-based send if API allows; ensure proxies/access logs do not retain full URLs; rotate token if leaked |
-| Docstring claims load from `.env` file but `load_settings()` reads `os.environ` only (no `python-dotenv`) | `config.py` | Medium (ops) | Document required export/`set -a; source .env` pattern, or add explicit dotenv load later — do not leave mismatch that causes operators to leave secrets in unexpected places |
+| Live executor passes `private_key` into third-party `ClobClient` and derives API creds | `src/executor.py` (`LiveClobExecutor._build_client`) | High (live only) | Pin + audit `py-clob-client`; dedicated low-balance wallet; never log settings; prefer OS secret store / env injection at runtime |
+| Telegram bot token placed in HTTPS URL path | `src/notifier.py` | Medium | Prefer header-based send if API allows; ensure proxies/access logs do not retain full URLs; rotate token if leaked |
+| Docstring claims load from `.env` file but `load_settings()` reads `os.environ` only (no `python-dotenv`) | `src/config.py` | Medium (ops) | Document required export/`set -a; source .env` pattern, or add explicit dotenv load later — do not leave mismatch that causes operators to leave secrets in unexpected places |
 
 **No Critical committed secrets found.**
 
@@ -79,7 +85,7 @@ Identity note: this is a **specialized Polymarket BTC 5-min engine**, not a gene
 | Obfuscated payloads / packed binaries | **Not found** |
 | Unexpected exfil endpoints | Outbound hosts observed: `clob.polymarket.com` (default), `api.binance.com`, `api.telegram.org`; Binance WS mentioned in comment only |
 | Hidden reverse shells / miners / keyloggers | **Not found** |
-| `approve` command | Stub that exits with instructions — does **not** broadcast approvals yet (`bot.py`) |
+| `approve` command | Stub that exits with instructions — does **not** broadcast approvals yet (`bot.py` at repo root) |
 
 **Verdict:** No malware / hostile wallet-theft code identified in audited tree. Residual risk is **intended live trading power** once `DRY_RUN=false` + ack + key + (future) client install.
 
@@ -117,7 +123,7 @@ No dependency upgrades or installs were performed during this audit.
 - All `*.py` source modules listed in inventory  
 - `tests/**` (synthetic fixtures only)  
 - `.env.example` (empty secrets)  
-- `.gitignore`, `README.md`, `ANALYST_PROMPT.md`, `LICENSE`  
+- `.gitignore`, `README.md`, `docs/analyst-prompt.md` (was `ANALYST_PROMPT.md`), `LICENSE`  
 - This `SECURITY_AUDIT.md`
 
 ### REMOVE / NEVER PUBLISH (operator runtime artifacts — none present in clone)
@@ -165,10 +171,10 @@ _None._
 
 ### High
 
-1. **Live trading + unpinned optional client** — Enabling live requires installing `py-clob-client` / possibly `web3` without a locked audited version today (`requirements.txt`, `executor.py`, README).  
+1. **Live trading + unpinned optional client** — Enabling live requires installing `py-clob-client` / possibly `web3` without a locked audited version today (`requirements.txt`, `src/executor.py`, README).  
    **Remediation:** Treat live as blocked for PolyTutor Phase 1; later pin hashes/versions after third-party audit.
 
-2. **Live reconciler not implemented** — `reconciler.py` raises `NotImplementedError` for exchange positions; README calls this a P1 launch blocker. Live without reconciliation risks undetected position drift.  
+2. **Live reconciler not implemented** — `src/reconciler.py` raises `NotImplementedError` for exchange positions; the module calls this a P1 launch blocker. Live without reconciliation risks undetected position drift.  
    **Remediation:** Keep live disabled in lab; implement before any live curriculum.
 
 3. **Private key in-process for live orders** — Expected for signing, but high blast radius if host compromised or `CLOB_HOST` pointed at attacker infrastructure.  
@@ -178,9 +184,9 @@ _None._
 
 4. **No CI/CD or automated secret/dependency scanning.**  
 5. **Unpinned / ranged core deps; no lockfile.**  
-6. **Telegram token in URL path** — log/proxy leakage risk (`notifier.py`).  
-7. **`.env` documentation vs loader mismatch** (`config.py` docstring / README `cp .env.example .env` vs `os.environ` only).  
-8. **Integrity bug (non-malicious):** `engine.py` calls `store.fills_for_order` but `store.py` defines `fill_for_order` — breaks state restore / settlement paths when hit (AttributeError). Flag for later fix; **not fixed in this audit.**  
+6. **Telegram token in URL path** — log/proxy leakage risk (`src/notifier.py`).  
+7. **`.env` documentation vs loader mismatch** (`src/config.py` docstring / README + `docs/getting-started.md` `cp .env.example .env` vs `os.environ` only).  
+8. **Integrity bug (non-malicious):** `src/engine.py` calls `store.fills_for_order` but `src/store.py` defines `fill_for_order` — breaks state restore / settlement paths when hit (AttributeError). Flag for later fix; **not fixed in this audit.**  
 9. **`bot.py approve` unfinished** — live allowance path incomplete (fails closed with exit 1).
 
 ### Low / Informational
