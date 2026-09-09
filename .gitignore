@@ -1,0 +1,23 @@
+# Secrets — the root .gitignore already covers .env, repeated here so this
+# directory is safe even if copied out of the repo.
+.env
+.env.*
+!.env.example
+
+# Trading state: the store holds your order/fill/PnL history and the
+# persisted risk-gate state. Never publish it.
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+*.sqlite3-journal
+
+# Operational files
+KILL_SWITCH
+*.log
+
+# Python build artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
