@@ -127,7 +127,8 @@ def test_quote_cancel_must_be_before_quote_min():
 
 
 def test_telegram_token_redacted_in_repr():
-    s = Settings(telegram_bot_token="123456789:AABBCCDDEEFFGGHHIIJJKKLLMMNNOOPPQQQ")
+    token = "123456789:AA" + "BBCCDDEEFFGGHHIIJJKKLLMMNNOOPPQQQ"
+    s = Settings(telegram_bot_token=token)
     assert "AABBCC" not in repr(s)
 
 

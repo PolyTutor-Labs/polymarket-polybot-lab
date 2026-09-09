@@ -115,7 +115,7 @@ def main(argv: list[str] | None = None) -> int:
 
     py = sys.executable
     steps = [
-        ("compileall", [py, "-m", "compileall", "-q", "."]),
+        ("compileall", [py, "-m", "compileall", "-q", "-x", r"\.git", "."]),
         ("syntax", None),
         ("pytest", [py, "-m", "pytest", "tests/", "-q"]),
         ("secret-scan", [py, str(root / "scripts" / "security" / "check_secrets.py")]),
