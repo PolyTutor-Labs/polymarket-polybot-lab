@@ -1,4 +1,6 @@
-# Core (engine runs and tests pass with only these)
+# Core (engine runs and tests pass with only these).
+# Ranged pins are an accepted paper-lab risk — see SECURITY.md.
+# Do not upgrade casually; do not uncomment live clients without an audit.
 pydantic>=2.5,<3
 pytest>=8
 

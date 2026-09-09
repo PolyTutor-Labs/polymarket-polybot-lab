@@ -11,7 +11,8 @@ trading product.
 1. [Getting started](getting-started.md) — install, DRY_RUN paper trading, live-mode warnings
 2. [Architecture](architecture.md) — BTC 5-minute engine, risk gate, CLOB path
 3. [Offline analyst prompt](analyst-prompt.md) — nightly read-only review (Hermes / Claude Code)
-4. [Security audit](../SECURITY_AUDIT.md) — pre-PolyTutor inventory (historical; paths noted)
+4. [Security](../SECURITY.md) — secrets, live-trading risk, CI/deps (not production-ready)
+5. [Security audit](../SECURITY_AUDIT.md) — pre-PolyTutor inventory (historical; paths noted)
 
 ## Repository map
 
@@ -21,7 +22,8 @@ trading product.
 | `strategies/` | Pair-cost arbitrage, maker pair quoting, directional DRY_RUN data collection |
 | `tests/` | Failure-mode tests (fees, risk, settlement, maker one-sided fills) |
 | `bot.py` | CLI: `run` / `status` / `reset` / `approve` (imports and data paths resolve from the repo root; cwd-independent) |
-| `.env.example` | Thresholds and safety flags (copy to `.env`; do not commit secrets) |
+| `.env.example` | Thresholds and safety flags (copy to `.env`; loader reads `os.environ` only) |
+| `scripts/security/` | Secret scanner (`check_secrets.py`); no deploy pipelines |
 
 ## Research identity
 

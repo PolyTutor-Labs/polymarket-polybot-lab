@@ -32,6 +32,7 @@ positions at their worst case, even across process restarts.
 | [docs/getting-started.md](docs/getting-started.md) | Install, DRY_RUN, live-mode warnings |
 | [docs/architecture.md](docs/architecture.md) | Tick path, module map, capital-protection invariants |
 | [docs/analyst-prompt.md](docs/analyst-prompt.md) | Nightly read-only review prompt |
+| [SECURITY.md](SECURITY.md) | Public-release hardening notes (secrets, live risk, CI) |
 | [SECURITY_AUDIT.md](SECURITY_AUDIT.md) | Pre-PolyTutor security inventory (findings unchanged) |
 | [strategies/README.md](strategies/README.md) | Pair arb, maker, directional experiments |
 
@@ -40,31 +41,35 @@ positions at their worst case, even across process restarts.
 ```
 .
 ├── README.md                 # this file — identity and navigation
-├── SECURITY_AUDIT.md         # audit record (stays at repo root)
+├── SECURITY.md               # public-release hardening notes
+├── SECURITY_AUDIT.md         # historical audit record (stays at repo root)
 ├── bot.py                    # CLI: run / status / reset / approve
 ├── docs/                     # getting started, architecture, analyst prompt
 ├── src/                      # BTC 5-minute engine (CLOB, risk, paper exec)
 ├── strategies/               # pair arb + maker + directional experiments
+├── scripts/security/         # secret scanner (no deploy pipelines)
 ├── tests/                    # failure-mode suite
-├── .env.example              # safety and strategy knobs
+├── .env.example              # safety and strategy knobs (placeholders)
 ├── requirements.txt
 └── LICENSE                   # Apache 2.0
 ```
 
-Empty `scripts/`, `config/`, `data/`, and `examples/` directories are
-intentionally absent — there is no content for them yet.
+Empty `config/`, `data/`, and `examples/` directories are intentionally
+absent — there is no content for them yet.
 
 ## Quick start (DRY_RUN)
 
 ```bash
 pip install -r requirements.txt
-cp .env.example .env          # edit thresholds if you want
+cp .env.example .env          # placeholders only; loader reads os.environ
+set -a; source .env; set +a   # required — .env is not auto-loaded
 python -m pytest tests/ -q    # all tests must pass
+python scripts/security/check_secrets.py
 python bot.py run             # paper-trades the live order books
 python bot.py status          # PnL, budget left, streak, halt state
 ```
 
-Full install notes, go-live criteria, and emergency stop:
+Full install notes, live-mode warnings, and emergency stop:
 [docs/getting-started.md](docs/getting-started.md).
 
 Architecture diagram and per-module responsibilities:

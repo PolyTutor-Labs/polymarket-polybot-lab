@@ -21,7 +21,12 @@ class Reconciler:
         self.dry_run = dry_run
 
     def exchange_open_positions(self) -> dict[str, float] | None:
-        """Live: query positions via CLOB / data API. Dry-run: None (skip)."""
+        """Live: query positions via CLOB / data API. Dry-run: None (skip).
+
+        Educational limitation: the live path is intentionally unimplemented.
+        This component is not production-ready. Do not enable live trading
+        expecting reconciliation to exist.
+        """
         if self.dry_run:
             return None
         raise NotImplementedError(

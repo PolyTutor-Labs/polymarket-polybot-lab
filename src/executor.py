@@ -17,6 +17,11 @@ LiveClobExecutor: thin adapter over py-clob-client. Imported lazily so the
 whole engine (and the test suite) runs without the dependency. Before any
 live order it verifies: ack phrase, key present, allowances approved.
 
+Educational live path: the signing key is held in-process and passed to
+whatever ``CLOB_HOST`` is configured. Do not log Settings. Do not point
+``CLOB_HOST`` at an unofficial host with a funded key. Not a production
+executor.
+
 NOTE on allowances: live trading on Polygon requires one-time ERC-20 (USDC)
 and ERC-1155 (CTF) approvals to the exchange contracts. The article's prompts
 omit this entirely — without it the first live order fails. Run
