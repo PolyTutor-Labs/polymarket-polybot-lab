@@ -77,17 +77,27 @@ Empty values in `.env.example` stay empty. Do not paste real credentials.
 
 ## CI / CD
 
-There is **no** `.github/workflows/` tree. This task does not add deploy
-pipelines or `contents: write` workflows. Run locally:
+Educational quality CI lives in [`.github/workflows/quality.yml`](.github/workflows/quality.yml).
+It is **not** a deploy pipeline and **not** live-trading automation.
+
+| Rule | Detail |
+|---|---|
+| Permissions | `contents: read` only (workflow and job). No write, no `pull-requests`, no packages. |
+| Third-party actions | Pinned by commit digest (`actions/checkout` v4.4.0, `actions/setup-python` v5.6.0). |
+| Jobs | `compileall`, `pytest tests/`, `scripts/security/check_secrets.py`, internal markdown-link check. |
+| Not present | Deploy, publish, live `bot.py run`, secret echo, `contents: write`. |
+
+Run the same gates locally:
 
 ```bash
 python -m compileall .
 python -m pytest tests/ -q
 python scripts/security/check_secrets.py
+python scripts/quality/check.py          # all of the above plus syntax + doc links
 ```
 
-If CI is added later: least privilege, pin third-party actions by digest,
-no write permission unless a documented job requires it, never echo secrets.
+Checkout uses `persist-credentials: false`. Do not add write permission
+unless a later documented job requires it.
 
 ## Dependencies
 
@@ -110,6 +120,6 @@ Deferred on purpose (do not treat as a launch checklist):
 - `approve` wiring to chain
 - Full live safety architecture / `CLOB_HOST` allowlist enforcement
 - Dependency pinning / upgrades
-- GitHub Actions creation
+- Deploy pipelines or live-trading automation (quality CI only)
 
 Trading logic, strategies, algorithms, and risk-gate behavior are unchanged.
