@@ -11,7 +11,9 @@ from unittest.mock import patch
 
 import pytest
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(_ROOT, "src"))
+sys.path.insert(0, os.path.join(_ROOT, "strategies"))
 
 from config import Settings
 from engine import HALT_KV_KEY, Engine
