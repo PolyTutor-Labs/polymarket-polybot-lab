@@ -10,9 +10,55 @@ Safety invariants:
 from __future__ import annotations
 
 import os
+from collections.abc import Mapping
+from pathlib import Path
+
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 LIVE_ACK_PHRASE = "I_UNDERSTAND_THE_RISKS"
+
+
+def repo_root() -> Path:
+    """Repository root (parent of ``src/``). Independent of the process cwd."""
+    return Path(__file__).resolve().parent.parent
+
+
+def data_dir(env: Mapping[str, str] | None = None) -> Path:
+    """Directory for SQLite and other data files.
+
+    ``POLYBOT_DATA_DIR`` overrides the default (repository root). Relative
+    values are resolved against the repository root, not the process cwd.
+    """
+    e = os.environ if env is None else env
+    raw = str(e.get("POLYBOT_DATA_DIR", "") or "").strip()
+    if not raw:
+        return repo_root()
+    p = Path(raw).expanduser()
+    if p.is_absolute():
+        return p.resolve()
+    return (repo_root() / p).resolve()
+
+
+def resolve_data_path(raw: str, *, env: Mapping[str, str] | None = None) -> str:
+    """Resolve a store path so it does not depend on the process cwd.
+
+    ``:memory:`` is left unchanged. Absolute paths (after ``~`` expansion)
+    are kept. Relative paths join ``POLYBOT_DATA_DIR`` or the repo root.
+    """
+    if raw == ":memory:":
+        return raw
+    p = Path(raw).expanduser()
+    if p.is_absolute():
+        return str(p)
+    return str((data_dir(env) / p).resolve())
+
+
+def resolve_ops_path(raw: str) -> str:
+    """Resolve an ops file (kill switch) against the repository root."""
+    p = Path(raw).expanduser()
+    if p.is_absolute():
+        return str(p)
+    return str((repo_root() / p).resolve())
 
 
 class Settings(BaseModel):
@@ -187,4 +233,8 @@ def load_settings(env: dict | None = None) -> Settings:
     for env_key, (attr, cast) in mapping.items():
         if env_key in e and e[env_key] != "":
             kw[attr] = cast(e[env_key])
-    return Settings(**kw)
+    settings = Settings(**kw)
+    return settings.model_copy(update={
+        "db_path": resolve_data_path(settings.db_path, env=e),
+        "kill_switch_file": resolve_ops_path(settings.kill_switch_file),
+    })

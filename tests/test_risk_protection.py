@@ -4,16 +4,16 @@ Each test encodes a way the previous version could lose more than intended.
 """
 from __future__ import annotations
 
-import os
 import sys
 import time
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
-_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(_ROOT, "src"))
-sys.path.insert(0, os.path.join(_ROOT, "strategies"))
+_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_ROOT / "src"))
+sys.path.insert(0, str(_ROOT / "strategies"))
 
 from config import Settings
 from engine import HALT_KV_KEY, Engine
@@ -54,7 +54,8 @@ def aligned_now() -> float:
 # ------------------------------------------------------- daily risk budget
 def mk_gate(**kw):
     defaults = dict(max_daily_loss=5, max_consecutive_losses=5,
-                    max_open_exposure=100, kill_switch_file="/tmp/__nope__",
+                    max_open_exposure=100,
+                    kill_switch_file=str(Path(__file__).resolve().parent / "__missing_kill_switch__"),
                     bankroll=100, max_daily_loss_pct=0.01)
     defaults.update(kw)
     return RiskGate(**defaults)

@@ -14,13 +14,13 @@ from __future__ import annotations
 
 import datetime as dt
 import logging
-import os
 import sys
 import time
+from pathlib import Path
 
-_ROOT = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(_ROOT, "src"))
-sys.path.insert(0, os.path.join(_ROOT, "strategies"))
+_ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(_ROOT / "src"))
+sys.path.insert(0, str(_ROOT / "strategies"))
 
 from config import load_settings
 from engine import HALT_KV_KEY, Engine

@@ -5,7 +5,9 @@ to `DRY_RUN=true`. No LLM is on the execution path.
 
 ## Install and run
 
-From the repository root:
+Install from the repository root. `python bot.py` may be launched from any
+working directory — imports and runtime files resolve from the repo root
+via `Path(__file__)`, not the process cwd.
 
 ```bash
 pip install -r requirements.txt
@@ -31,8 +33,11 @@ Run DRY_RUN for **2–4 weeks**. Go-live criteria (all of them):
 reads `os.environ` (it does not auto-load a `.env` file). Export variables
 or `set -a; source .env; set +a` before `python bot.py run`.
 
-SQLite state (`DB_PATH`, default `polybot.sqlite3`) and `KILL_SWITCH` are
-written in the working directory. Both are gitignored.
+SQLite state (`DB_PATH`, default `polybot.sqlite3`) is written under
+`POLYBOT_DATA_DIR` when that variable is set, otherwise under the
+repository root. `KILL_SWITCH` (or `KILL_SWITCH_FILE`) is resolved against
+the repository root. Relative paths do not follow the process cwd. Both
+the database and the kill-switch file are gitignored.
 
 ## Going live (deliberately annoying)
 
@@ -55,7 +60,7 @@ If you still proceed, the original engine gates remain:
 6. Run on a VPS, not a laptop. Keep `MAX_BET=2` until the analyst report
    says otherwise.
 
-**Emergency stop:** `touch KILL_SWITCH` in the working directory — next
+**Emergency stop:** `touch KILL_SWITCH` at the repository root — next
 risk-gate check halts the engine. Restart requires removing the file,
 `python bot.py reset`, and a human review of the halt reason.
 

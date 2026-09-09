@@ -20,7 +20,7 @@ trading product.
 | `src/` | BTC 5-minute engine: clock, CLOB/spot feeds, fees, sizing, risk gate, executor, store |
 | `strategies/` | Pair-cost arbitrage, maker pair quoting, directional DRY_RUN data collection |
 | `tests/` | Failure-mode tests (fees, risk, settlement, maker one-sided fills) |
-| `bot.py` | CLI: `run` / `status` / `reset` / `approve` (run from the repository root) |
+| `bot.py` | CLI: `run` / `status` / `reset` / `approve` (imports and data paths resolve from the repo root; cwd-independent) |
 | `.env.example` | Thresholds and safety flags (copy to `.env`; do not commit secrets) |
 
 ## Research identity

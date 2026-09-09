@@ -5,22 +5,29 @@ pessimistic fills, calibration math, live-mode safety gate.
 from __future__ import annotations
 
 import math
-import os
 import sys
+from pathlib import Path
 
 import pytest
 
-_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(_ROOT, "src"))
-sys.path.insert(0, os.path.join(_ROOT, "strategies"))
+_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_ROOT / "src"))
+sys.path.insert(0, str(_ROOT / "strategies"))
 
 from calibration import CalibrationTracker
-from config import LIVE_ACK_PHRASE, Settings, load_settings
+from config import (
+    LIVE_ACK_PHRASE,
+    Settings,
+    load_settings,
+    repo_root,
+    resolve_data_path,
+)
 from executor import DryRunExecutor
 from fees import (directional_net_edge, pair_cost_net_edge, round_to_tick,
                   taker_fee_per_share)
 from models import BookTop, MarketWindow, Order, Outcome, Side, deterministic_client_id
 from risk_gate import RiskGate
+from store import Store
 from sizing import kelly_fraction, position_notional, shrink_probability
 from strategy import BrownianDirectional, EwmaVol, PairCostArb
 from timeutil import in_entry_zone, seconds_to_close, window_bounds, window_start
@@ -103,9 +110,12 @@ def test_shrinkage_pulls_to_prior():
 
 
 # ------------------------------------------------------------------ risk gate
+_MISSING_KILL_SWITCH = str(Path(__file__).resolve().parent / "__missing_kill_switch__")
+
+
 def make_gate(**kw):
     defaults = dict(max_daily_loss=5, max_consecutive_losses=3,
-                    max_open_exposure=10, kill_switch_file="/tmp/__no_such_file__")
+                    max_open_exposure=10, kill_switch_file=_MISSING_KILL_SWITCH)
     defaults.update(kw)
     return RiskGate(**defaults)
 
@@ -271,3 +281,38 @@ def test_full_kelly_forbidden():
 def test_private_key_redacted_in_repr():
     s = Settings(private_key="0x" + "a" * 64)
     assert "aaaa" not in repr(s)
+
+
+# ----------------------------------------------------------- path portability
+def test_relative_db_path_is_cwd_independent(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    s = load_settings({"DB_PATH": "polybot.sqlite3"})
+    assert Path(s.db_path) == repo_root() / "polybot.sqlite3"
+    assert Path(s.kill_switch_file) == repo_root() / "KILL_SWITCH"
+
+
+def test_polybot_data_dir_overrides_relative_db(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    s = load_settings({"POLYBOT_DATA_DIR": str(tmp_path), "DB_PATH": "lab.sqlite3"})
+    assert Path(s.db_path) == (tmp_path / "lab.sqlite3").resolve()
+
+
+def test_absolute_db_path_unchanged(tmp_path):
+    abs_db = tmp_path / "abs.sqlite3"
+    s = load_settings({"DB_PATH": str(abs_db)})
+    assert Path(s.db_path) == abs_db
+
+
+def test_memory_store_path_unchanged():
+    assert resolve_data_path(":memory:") == ":memory:"
+
+
+def test_store_relative_path_does_not_use_cwd(tmp_path, monkeypatch):
+    monkeypatch.setenv("POLYBOT_DATA_DIR", str(tmp_path))
+    cwd = tmp_path / "other-cwd"
+    cwd.mkdir()
+    monkeypatch.chdir(cwd)
+    store = Store("lab.sqlite3")
+    store.close()
+    assert (tmp_path / "lab.sqlite3").exists()
+    assert not (cwd / "lab.sqlite3").exists()
