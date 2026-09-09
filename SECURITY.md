@@ -7,7 +7,7 @@ trading product.
 
 The historical inventory is in [`SECURITY_AUDIT.md`](SECURITY_AUDIT.md)
 (pre-PolyTutor; findings left as written). This file is the public-release
-hardening note. Task 8 documents residual risk; it does **not** implement
+hardening note. It documents residual risk; it does **not** implement
 live trading, pin third-party clients, or add deploy pipelines.
 
 ## Report a vulnerability
@@ -42,7 +42,7 @@ It is **not** ready to run with funds.
 | `CLOB_HOST` | Defaults to `https://clob.polymarket.com`. Any URL is accepted. | Unofficial host + live key = signed requests to attacker infrastructure. Do not change the default for live experiments. |
 | Live reconciler | `Reconciler.exchange_open_positions` raises `NotImplementedError` when `dry_run` is false | Incomplete component. Live without reconciliation can miss position drift. **Do not implement here; not production-ready.** |
 | `python bot.py approve` | Stub; exits 1 | Allowance path unfinished (fails closed). |
-| `py-clob-client` / `web3` | Commented placeholders in `requirements.txt` | Do not install unpinned for live. Audit and pin later; this task does not upgrade deps. |
+| `py-clob-client` / `web3` | Commented placeholders in `requirements.txt` | Do not install unpinned for live. Audit and pin later; this lab does not upgrade deps. |
 | Dual gate | `DRY_RUN` default true + `LIVE_TRADING_ACK=I_UNDERSTAND_THE_RISKS` | Keep both. Either one alone refuses live start. |
 
 `DRY_RUN` paper research is the supported mode.

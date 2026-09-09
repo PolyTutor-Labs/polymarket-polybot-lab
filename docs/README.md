@@ -18,6 +18,8 @@ financial advice, and not a live trading service.
 7. [Offline analyst prompt](analyst-prompt.md) — read-only nightly review
 8. [Security](../SECURITY.md) — secrets, live-trading risk, CI/deps
 9. [Security audit](../SECURITY_AUDIT.md) — pre-PolyTutor inventory (historical)
+10. [Changelog](../CHANGELOG.md) — public lab version **v0.1.0** (packaging only)
+11. [Contributing](../CONTRIBUTING.md) · [Disclaimer](../DISCLAIMER.md) · [NOTICE](../NOTICE)
 
 Code-adjacent strategy index: [strategies/README.md](../strategies/README.md).
 
@@ -33,6 +35,8 @@ Code-adjacent strategy index: [strategies/README.md](../strategies/README.md).
 | `scripts/security/` | Secret scanner (`check_secrets.py`); no deploy pipelines |
 | `scripts/quality/` | Local quality runner (`check.py`): compileall, pytest, secrets, doc links |
 | `.github/workflows/` | Educational quality CI only (`contents: read`; no deploy) |
+| `CHANGELOG.md` | Public lab version history (packaging, not performance) |
+| `CONTRIBUTING.md` / `DISCLAIMER.md` / `NOTICE` | Release metadata and original attribution |
 
 ## Research identity
 
@@ -49,5 +53,5 @@ paper / DRY_RUN research
 ```
 
 Live trading remains gated and out of scope until the High findings in
-`SECURITY_AUDIT.md` are addressed in a later phase. This documentation
-task does not start that work.
+`SECURITY_AUDIT.md` are addressed in a later phase. Lab packaging does
+not start that work.

@@ -30,3 +30,15 @@ __pycache__/
 .pytest_cache/
 .venv/
 venv/
+*.egg-info/
+dist/
+build/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Local editor / OS junk — do not publish
+.DS_Store
+.idea/
+.vscode/

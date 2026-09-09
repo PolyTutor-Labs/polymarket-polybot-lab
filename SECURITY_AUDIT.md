@@ -243,3 +243,21 @@ _None._
 ---
 
 *End of pre-PolyTutor security audit. STOP after audit — no source fixes, no upstream push, no target repo creation.*
+
+---
+
+## Post-audit public-release note (2026-09-09)
+
+This file remains the **historical** pre-PolyTutor inventory. Findings
+above are left as written. It is not a live-trading launch checklist.
+
+Subsequent PolyTutor lab work (not a re-audit) added:
+
+- Read-only quality CI (`.github/workflows/quality.yml`)
+- `scripts/security/check_secrets.py` and `SECURITY.md`
+- Engine modules under `src/` and experiments under `strategies/`
+
+The target repository
+[PolyTutor-Labs/polymarket-polybot-lab](https://github.com/PolyTutor-Labs/polymarket-polybot-lab)
+now exists. The "future target" and local audit-clone path lines above
+are historical workspace notes, not operator credentials.

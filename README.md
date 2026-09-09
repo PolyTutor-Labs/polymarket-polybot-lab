@@ -21,6 +21,9 @@ This repository is an **educational engine** and **research lab**. It is
 **not** a production trading platform, **not** a guaranteed-profit system,
 **not** financial advice, and **not** a live trading service.
 
+Public lab version: **v0.1.0** — [`CHANGELOG.md`](CHANGELOG.md). That
+version is a packaging snapshot, not a performance claim.
+
 ## Overview
 
 The engine studies one market family: Polymarket BTC 5-minute Up/Down
@@ -234,7 +237,7 @@ keys, tokens, `.env` contents, or wallet seed material.
 
 ## Limitations
 
-Deferred on purpose. **Documented only — not fixed in this task.**
+Deferred on purpose. **Documented only — not fixed in the lab packaging.**
 
 - Live reconciler incomplete (`NotImplementedError` when `dry_run` is false)
 - `fills_for_order` / `fill_for_order` integrity finding (audit Medium)
@@ -247,6 +250,8 @@ and cannot model queue position. Details:
 [`docs/limitations.md`](docs/limitations.md).
 
 ## Contributing
+
+Canonical guide: [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 This is an educational research lab. Contributions that help people
 **learn the engine** are welcome. Contributions that market it as a live
@@ -267,6 +272,9 @@ product or a source of guaranteed returns are not.
 Learning path for reviewers: [`docs/README.md`](docs/README.md).
 
 ## Disclaimer
+
+Full text: [`DISCLAIMER.md`](DISCLAIMER.md). License and attribution:
+[`LICENSE`](LICENSE), [`NOTICE`](NOTICE).
 
 This software is provided for **education and research** under the
 Apache 2.0 license ([`LICENSE`](LICENSE)). It is offered **as is**,
@@ -308,7 +316,8 @@ far is:
 | Portability | Paths resolve from the repository root, not process cwd |
 | Security hardening | `SECURITY.md`, secret scanner, live-risk documentation, Telegram redaction |
 | Testing | Quality gates, compile/link/secret CI, lab-hygiene tests |
-| Educational documentation | This README and the `docs/` learning path (this task) |
+| Educational documentation | This README and the `docs/` learning path |
+| Public release metadata | Changelog, NOTICE, contributor guide, disclaimer |
 
 Trading logic, strategies, algorithms, installed dependencies, and
-execution behavior are unchanged by the documentation transformation.
+execution behavior are unchanged by the PolyTutor lab packaging.
