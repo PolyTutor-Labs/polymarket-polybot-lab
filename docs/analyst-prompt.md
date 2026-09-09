@@ -1,8 +1,13 @@
 # Offline Analyst — Nightly Review Prompt (Hermes / Claude Code)
 
-This is where the LLM belongs in this system: OUTSIDE the execution path,
-reviewing results and proposing changes as diffs that a human approves.
-Schedule it nightly (Hermes cron / Claude Code scheduled task).
+This is where the LLM belongs in this educational lab: OUTSIDE the
+execution path, reviewing paper / `DRY_RUN` results and proposing
+changes as diffs that a human approves. It is a prompt, not a running
+service. See [paper-trading.md](paper-trading.md) and the
+[docs index](README.md).
+
+Schedule it nightly only if you already have a local store from paper
+sessions (Hermes cron / Claude Code scheduled task).
 
 ---
 
