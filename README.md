@@ -48,7 +48,9 @@ positions at their worst case, even across process restarts.
 ├── src/                      # BTC 5-minute engine (CLOB, risk, paper exec)
 ├── strategies/               # pair arb + maker + directional experiments
 ├── scripts/security/         # secret scanner (no deploy pipelines)
-├── tests/                    # failure-mode suite
+├── scripts/quality/          # compile / pytest / secret / link gates
+├── tests/                    # failure-mode + quality-gate suite
+├── .github/workflows/        # educational quality CI (read-only)
 ├── .env.example              # safety and strategy knobs (placeholders)
 ├── requirements.txt
 └── LICENSE                   # Apache 2.0
@@ -63,8 +65,10 @@ absent — there is no content for them yet.
 pip install -r requirements.txt
 cp .env.example .env          # placeholders only; loader reads os.environ
 set -a; source .env; set +a   # required — .env is not auto-loaded
+python -m compileall .        # syntax check
 python -m pytest tests/ -q    # all tests must pass
 python scripts/security/check_secrets.py
+python scripts/quality/check.py   # compile + tests + secrets + doc links
 python bot.py run             # paper-trades the live order books
 python bot.py status          # PnL, budget left, streak, halt state
 ```

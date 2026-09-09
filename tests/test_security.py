@@ -14,7 +14,7 @@ sys.path.insert(0, str(_ROOT / "src"))
 sys.path.insert(0, str(_ROOT / "scripts" / "security"))
 
 import notifier as notifier_mod
-from check_secrets import findings_in_text, scan_repo
+from check_secrets import findings_in_text, main as secret_scan_main, scan_repo
 from notifier import TelegramNotifier, redact
 
 
@@ -79,3 +79,28 @@ def test_repo_secret_scan_is_clean():
     assert findings == [], [
         f"{f.path}:{f.line}:{f.category}" for f in findings
     ]
+
+
+def test_secret_scanner_flags_github_slack_telegram_shapes():
+    github = "ghp_" + "A" * 36
+    slack = "xoxb-" + "1234567890-123456789012-abcdefghij"
+    telegram = "123456789:AA" + "E" * 35
+    hits = findings_in_text(
+        f"token={github}\nhook={slack}\nbot={telegram}\n",
+        "leak.txt",
+    )
+    cats = {h.category for h in hits}
+    assert "github_token" in cats
+    assert "slack_token" in cats
+    assert "telegram_bot_token" in cats
+    assert all(h.path == "leak.txt" for h in hits)
+
+
+def test_secret_scanner_flags_assignment_of_non_placeholder():
+    body = "API_SECRET=" + '"not-a-placeholder-value"\n'
+    hits = findings_in_text(body, "env.txt")
+    assert any(h.category == "credential_assignment" for h in hits)
+
+
+def test_secret_scanner_cli_exits_zero_on_clean_repo():
+    assert secret_scan_main() == 0

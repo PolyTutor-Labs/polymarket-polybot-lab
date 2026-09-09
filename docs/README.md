@@ -24,6 +24,8 @@ trading product.
 | `bot.py` | CLI: `run` / `status` / `reset` / `approve` (imports and data paths resolve from the repo root; cwd-independent) |
 | `.env.example` | Thresholds and safety flags (copy to `.env`; loader reads `os.environ` only) |
 | `scripts/security/` | Secret scanner (`check_secrets.py`); no deploy pipelines |
+| `scripts/quality/` | Local quality runner (`check.py`): compileall, pytest, secrets, doc links |
+| `.github/workflows/` | Educational quality CI only (`contents: read`; no deploy) |
 
 ## Research identity
 

@@ -13,8 +13,10 @@ via `Path(__file__)`, not the process cwd.
 pip install -r requirements.txt
 cp .env.example .env          # placeholders only
 set -a; source .env; set +a   # required — load_settings() does not read .env
+python -m compileall .
 python -m pytest tests/ -q    # all tests must pass
 python scripts/security/check_secrets.py
+python scripts/quality/check.py
 python bot.py run             # paper-trades the live order books
 python bot.py status          # PnL, budget left, streak, halt state
 ```
